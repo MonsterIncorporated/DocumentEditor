@@ -128,7 +128,7 @@ jobs:
         working-directory: Backend
 
       - name: Build and analyze Frontend
+        working-directory: Frontend
         uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        working-directory: Frontend
