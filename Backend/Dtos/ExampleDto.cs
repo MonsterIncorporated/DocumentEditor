@@ -1,6 +1,6 @@
 ﻿namespace document_editor.Dtos;
 
-public class ExampleDtowwwwwwww
+public class ExampleDto
 {
 
 }
