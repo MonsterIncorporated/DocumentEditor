@@ -34,11 +34,11 @@ jobs:
       - name: Format
         run: dotnet format document-editor.sln --verify-no-changes
         working-directory: Backend
-        
+
       - name: Test
         run: dotnet test document-editor.sln
         working-directory: Backend
-        
+
       - name: Build
         run: dotnet build --configuration Release --no-restore
         working-directory: Backend
@@ -68,22 +68,8 @@ jobs:
         run: npx ng build
         working-directory: Frontend
 
-  call-backend:
-    if: github.event_name == 'push' && github.event.pull_request.base.ref != 'main'
+  SonarQube:
     needs: [ Backend, Frontend ]
-    uses: ./.github/workflows/test_backend.yml
-    secrets: inherit
-    permissions:
-      id-token: write
-      contents: read
-
-  call-frontend:
-    if: github.event_name == 'push' && github.event.pull_request.base.ref != 'main'
-    needs: [ Backend, Frontend ]
-    uses: ./.github/workflows/test_frontend.yml
-    secrets: inherit
-
-  sonarqube:
     runs-on: windows-latest
     steps:
       - name: Set up JDK 17
@@ -131,3 +117,18 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  
+  call-backend:
+    if: github.event_name == 'push' && github.event.pull_request.base.ref != 'main'
+    needs: [ Backend, Frontend, SonarQube ]
+    uses: ./.github/workflows/test_backend.yml
+    secrets: inherit
+    permissions:
+      id-token: write
+      contents: read
+
+  call-frontend:
+    if: github.event_name == 'push' && github.event.pull_request.base.ref != 'main'
+    needs: [ Backend, Frontend, SonarQube ]
+    uses: ./.github/workflows/test_frontend.yml
+    secrets: inherit
