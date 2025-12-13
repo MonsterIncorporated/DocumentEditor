@@ -71,7 +71,7 @@ jobs:
   call-backend:
     if: github.event_name == 'push' && github.event.pull_request.base.ref != 'main'
     needs: [ Backend, Frontend ]
-    uses: ./.github/workflows/test_backend-documenteditor.yml
+    uses: ./.github/workflows/test_backend.yml
     secrets: inherit
     permissions:
       id-token: write
@@ -80,5 +80,54 @@ jobs:
   call-frontend:
     if: github.event_name == 'push' && github.event.pull_request.base.ref != 'main'
     needs: [ Backend, Frontend ]
-    uses: ./.github/workflows/azure-static-web-apps-witty-meadow-08e833010.yml
+    uses: ./.github/workflows/test_frontend.yml
     secrets: inherit
+
+  sonarqube:
+    runs-on: windows-latest
+    steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'zulu'
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cache SonarQube Cloud packages
+        uses: actions/cache@v4
+        with:
+          path: ~\sonar\cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache SonarQube Cloud scanner
+        id: cache-sonar-scanner
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}\scanner
+          key: ${{ runner.os }}-sonar-scanner
+          restore-keys: ${{ runner.os }}-sonar-scanner
+
+      - name: Install SonarQube Cloud scanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        shell: powershell
+        run: |
+          New-Item -Path ${{ runner.temp }}\scanner -ItemType Directory
+          dotnet tool update dotnet-sonarscanner --tool-path ${{ runner.temp }}\scanner
+
+      - name: Build and analyze Backend
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        shell: powershell
+        run: |
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"MonsterLuni_DocumentEditor" /o:"monsterluni" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          dotnet build
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+        working-directory: Backend
+
+      - name: Build and analyze Frontend
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
