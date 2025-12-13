@@ -71,7 +71,7 @@ jobs:
   call-backend:
     if: github.event_name == 'push' && github.event.pull_request.base.ref != 'main'
     needs: [ Backend, Frontend ]
-    uses: ./.github/workflows/test_backend-documenteditor.yml
+    uses: ./.github/workflows/test_backend.yml
     secrets: inherit
     permissions:
       id-token: write
@@ -80,7 +80,7 @@ jobs:
   call-frontend:
     if: github.event_name == 'push' && github.event.pull_request.base.ref != 'main'
     needs: [ Backend, Frontend ]
-    uses: ./.github/workflows/azure-static-web-apps-witty-meadow-08e833010.yml
+    uses: ./.github/workflows/test_frontend.yml
     secrets: inherit
 
   sonarqube:
