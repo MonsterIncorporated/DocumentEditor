@@ -108,21 +108,62 @@ jobs:
           New-Item -Path ${{ runner.temp }}\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path ${{ runner.temp }}\scanner
 
-      - name: Build and analyze Backend
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Analyze Start
         shell: powershell
-        run: |
-          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"MonsterIncorporated_DocumentEditor_13865ef2-2dd5-4435-bfd1-c361c49e187f" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}"
-          dotnet build
-          ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-        working-directory: Backend
-
-      - name: Build and analyze Frontend
-        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          dotnet tool install --global dotnet-sonarscanner
+          dotnet-sonarscanner begin /k:"MonsterIncorporated_DocumentEditor_13865ef2-2dd5-4435-bfd1-c361c49e187f"
+          
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Installing Dependencies
+        run: dotnet restore document-editor.sln
+        working-directory: Backend
+
+      - name: Format
+        run: dotnet format document-editor.sln --verify-no-changes
+        working-directory: Backend
+
+      - name: Test
+        run: dotnet test document-editor.sln
+        working-directory: Backend
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+        working-directory: Backend
+
+      - name: Setup Node LTS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+          cache-dependency-path: Frontend/package-lock.json
+        
+      - name: Installing Dependencies
+        run: npm ci
+        working-directory: Frontend
+
+      - name: Linting
+        run: npx ng lint
+        working-directory: Frontend
+
+      - name: Building
+        run: npx ng build
+        working-directory: Frontend
+          
+      - name: Analyze End
+        shell: powershell
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          dotnet-sonarscanner end /d:sonar.token="$env:SONAR_TOKEN"
 
   call-backend:
     if: github.event_name == 'push' && github.event.pull_request.base.ref != 'main'
