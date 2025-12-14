@@ -1,4 +1,7 @@
-/Backend/obj/
-/Backend/bin/
-/Backend/.idea/
+﻿/Backend/document-editor/obj/
+/Backend/document-editor/bin/
+/Backend/document-editor/.idea/
+/Backend/document-editor-test/obj/
+/Backend/document-editor-test/bin/
+/Backend/document-editor-test/.idea/
 .idea/

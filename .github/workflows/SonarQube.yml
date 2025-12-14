@@ -64,6 +64,6 @@ jobs:
         run: |
           dotnet tool install --global dotnet-sonarscanner
           dotnet-sonarscanner begin /k:"MonsterIncorporated_DocumentEditor_13865ef2-2dd5-4435-bfd1-c361c49e187f" /d:sonar.host.url="$env:SONAR_HOST_URL" /d:sonar.token="$env:SONAR_TOKEN" /d:sonar.exclusions="**/node_modules/**,**/dist/**,**/bin/**,**/obj/**" /d:sonar.cs.opencover.reportsPaths="document-editor-test\TestResults\coverage.opencover.xml"
-          dotnet build --configuration Release
+          dotnet build document-editor.sln --configuration Release
           dotnet test document-editor.sln -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=.\TestResults\coverage.opencover.xml
           dotnet-sonarscanner end /d:sonar.token="$env:SONAR_TOKEN"
