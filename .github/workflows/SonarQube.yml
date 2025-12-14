@@ -59,7 +59,7 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
           dotnet tool install --global dotnet-sonarscanner
-          dotnet-sonarscanner begin /k:"MonsterIncorporated_DocumentEditor_13865ef2-2dd5-4435-bfd1-c361c49e187f" /d:sonar.host.url="$env:SONAR_HOST_URL" /d:sonar.token="$env:SONAR_TOKEN" /d:sonar.sources=".,../Frontend/src"
+          dotnet-sonarscanner begin /k:"MonsterIncorporated_DocumentEditor_13865ef2-2dd5-4435-bfd1-c361c49e187f" /d:sonar.host.url="$env:SONAR_HOST_URL" /d:sonar.token="$env:SONAR_TOKEN" /d:sonar.exclusions="**/node_modules/**,**/dist/**,**/bin/**,**/obj/**"
 
       - name: Setup Backend
         uses: actions/setup-dotnet@v3
