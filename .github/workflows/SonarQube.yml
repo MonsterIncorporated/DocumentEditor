@@ -52,13 +52,14 @@ jobs:
           dotnet tool update dotnet-sonarscanner --tool-path ${{ runner.temp }}\scanner
   
       - name: Analyze Start
+        working-directory: Backend
         shell: powershell
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
           dotnet tool install --global dotnet-sonarscanner
-          dotnet-sonarscanner begin /k:"MonsterIncorporated_DocumentEditor_13865ef2-2dd5-4435-bfd1-c361c49e187f" /d:sonar.host.url="$env:SONAR_HOST_URL" /d:sonar.token="$env:SONAR_TOKEN"
+          dotnet-sonarscanner begin /k:"MonsterIncorporated_DocumentEditor_13865ef2-2dd5-4435-bfd1-c361c49e187f" /d:sonar.host.url="$env:SONAR_HOST_URL" /d:sonar.token="$env:SONAR_TOKEN" /d:sonar.sources=".,../Frontend/src"
 
       - name: Setup Backend
         uses: actions/setup-dotnet@v3
@@ -81,6 +82,7 @@ jobs:
         working-directory: Frontend
   
       - name: Analyze End
+        working-directory: Backend
         shell: powershell
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
