@@ -86,5 +86,5 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
-          dotnet-sonarscanner end /d:sonar.token="$env:SONAR_TOKEN" /d:sonar.token="$env:SONAR_TOKEN"
+          dotnet-sonarscanner end /d:sonar.token="$env:SONAR_TOKEN"
     
