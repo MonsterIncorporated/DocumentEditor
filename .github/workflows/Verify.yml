@@ -75,7 +75,7 @@ jobs:
 
   call-backend:
     if: github.event_name == 'push' && github.event.pull_request.base.ref != 'main'
-    needs: [ Backend, Frontend, SonarQube ]
+    needs: [ Backend, Frontend ]
     uses: ./.github/workflows/test_backend.yml
     secrets: inherit
     permissions:
@@ -84,6 +84,6 @@ jobs:
 
   call-frontend:
     if: github.event_name == 'push' && github.event.pull_request.base.ref != 'main'
-    needs: [ Backend, Frontend, SonarQube ]
+    needs: [ Backend, Frontend ]
     uses: ./.github/workflows/test_frontend.yml
     secrets: inherit
