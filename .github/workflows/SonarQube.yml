@@ -1,0 +1,69 @@
+name: SonarQube
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - test
+      - main
+  pull_request:
+    branches:
+      - main
+      - test
+  pull_request_target:
+    branches:
+      - main
+      - test
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  SonarQube:
+    runs-on: windows-latest
+    steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'zulu'
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+  
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}\cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+  
+      - name: Cache SonarQube scanner
+        id: cache-sonar-scanner
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}\scanner
+          key: ${{ runner.os }}-sonar-scanner
+          restore-keys: ${{ runner.os }}-sonar-scanner
+  
+      - name: Install SonarQube scanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        shell: powershell
+        run: |
+          New-Item -Path ${{ runner.temp }}\scanner -ItemType Directory
+          dotnet tool update dotnet-sonarscanner --tool-path ${{ runner.temp }}\scanner
+  
+      - name: Analyze
+        working-directory: Backend
+        shell: powershell
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          dotnet tool install --global dotnet-sonarscanner
+          dotnet-sonarscanner begin /k:"MonsterIncorporated_DocumentEditor_13865ef2-2dd5-4435-bfd1-c361c49e187f" /d:sonar.host.url="$env:SONAR_HOST_URL" /d:sonar.token="$env:SONAR_TOKEN" /d:sonar.exclusions="**/node_modules/**,**/dist/**,**/bin/**,**/obj/**" /d:sonar.cs.opencover.reportsPaths="document-editor-test\TestResults\coverage.opencover.xml"
+          dotnet build --configuration Release
+          dotnet test document-editor.sln -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=.\TestResults\coverage.opencover.xml
+          dotnet-sonarscanner end /d:sonar.token="$env:SONAR_TOKEN"
