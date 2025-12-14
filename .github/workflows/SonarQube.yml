@@ -55,7 +55,7 @@ jobs:
           New-Item -Path ${{ runner.temp }}\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path ${{ runner.temp }}\scanner
   
-      - name: Analyze Start
+      - name: Analyze
         working-directory: Backend
         shell: powershell
         env:
@@ -64,27 +64,7 @@ jobs:
         run: |
           dotnet tool install --global dotnet-sonarscanner
           dotnet tool install --global dotnet-coverage
-          dotnet-sonarscanner begin /k:"MonsterIncorporated_DocumentEditor_13865ef2-2dd5-4435-bfd1-c361c49e187f" /d:sonar.host.url="$env:SONAR_HOST_URL" /d:sonar.token="$env:SONAR_TOKEN" /d:sonar.exclusions="**/node_modules/**,**/dist/**,**/bin/**,**/obj/**"
-          dotnet build --configuration Release --no-restore
+          dotnet-sonarscanner begin /k:"MonsterIncorporated_DocumentEditor_13865ef2-2dd5-4435-bfd1-c361c49e187f" /d:sonar.host.url="$env:SONAR_HOST_URL" /d:sonar.token="$env:SONAR_TOKEN" /d:sonar.exclusions="**/node_modules/**,**/dist/**,**/bin/**,**/obj/**" /d:sonar.cs.vscoveragexml.reportsPaths="coverage.xml"
+          dotnet build --configuration Release
           dotnet-coverage collect "dotnet test document-editor.sln" -f xml -o "coverage.xml"
-      
-      - name: Setup Frontend
-        uses: actions/setup-node@v3
-        with:
-          node-version: 'lts/*'
-          cache: 'npm'
-          cache-dependency-path: Frontend/package-lock.json
-
-      - name: Test and Build Frontend
-        run: npm ci && npx ng build
-        working-directory: Frontend
-  
-      - name: Analyze End
-        working-directory: Backend
-        shell: powershell
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: |
           dotnet-sonarscanner end /d:sonar.token="$env:SONAR_TOKEN"
-    
