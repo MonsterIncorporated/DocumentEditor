@@ -10,6 +10,10 @@ on:
     branches:
       - main
       - test
+  pull_request_target:
+    branches:
+      - main
+      - test
 
 permissions:
   contents: read
@@ -59,16 +63,10 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
           dotnet tool install --global dotnet-sonarscanner
+          dotnet tool install --global dotnet-coverage
           dotnet-sonarscanner begin /k:"MonsterIncorporated_DocumentEditor_13865ef2-2dd5-4435-bfd1-c361c49e187f" /d:sonar.host.url="$env:SONAR_HOST_URL" /d:sonar.token="$env:SONAR_TOKEN" /d:sonar.exclusions="**/node_modules/**,**/dist/**,**/bin/**,**/obj/**"
-
-      - name: Setup Backend
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '9.0.x'
-
-      - name: Test and Build Backend
-        run: dotnet test document-editor.sln && dotnet build --configuration Release --no-restore
-        working-directory: Backend
+          dotnet build --configuration Release --no-restore
+          dotnet-coverage collect "dotnet test document-editor.sln" -f xml -o "coverage.xml"
       
       - name: Setup Frontend
         uses: actions/setup-node@v3
