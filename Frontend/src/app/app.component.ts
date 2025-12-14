@@ -12,6 +12,7 @@ import {environment} from '../environments/environment';
 export class AppComponent {
   public URL: string;
   constructor() {
+    var hello = "Hello World";
     this.URL = environment.apiUrl;
   }
 }
