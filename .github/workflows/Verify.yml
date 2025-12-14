@@ -113,7 +113,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"MonsterIncorporated_DocumentEditor_cde453a6-19be-4eec-9eda-e03b5eec3bf6" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}"
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"MonsterIncorporated_DocumentEditor_13865ef2-2dd5-4435-bfd1-c361c49e187f" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}"
           dotnet build
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
         working-directory: Backend
