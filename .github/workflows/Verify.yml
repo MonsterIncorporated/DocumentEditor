@@ -120,6 +120,10 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
       - name: Comment PR with result
+        permissions:
+          contents: read
+          issues: write
+          pull-requests: write
         if: github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
