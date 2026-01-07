@@ -17,6 +17,15 @@ jobs:
           sed -i "s|API_URL_PLACEHOLDER|${{ secrets.TESTING_API_URL }}|" src/environments/environment.testing.ts
         working-directory: Frontend
 
+      - name: Install semantic-release
+        run: npm install -g semantic-release @semantic-release/git @semantic-release/github
+
+      - name: Run semantic-release
+        id: semver
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: semantic-release
+
       - name: Login GHCR
         uses: docker/login-action@v3
         with:
@@ -24,14 +33,24 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & push to ghcr
+
+      - name: Docker meta
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/document-editor-frontend
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=raw,value=latest
+
+      - name: Build & push
         uses: docker/build-push-action@v6
         with:
-          context: ./frontend
+          context: ./Docker/Frontend
           push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/document-editor-frontend:latest
-            ghcr.io/${{ github.repository_owner }}/document-editor-frontend:${{ github.sha }}
+          tags: ${{ steps.meta-frontend.outputs.tags }}
 
       - name: Build And Deploy
         id: builddeploy
