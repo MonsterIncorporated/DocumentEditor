@@ -61,4 +61,4 @@ jobs:
           action: "upload"
           app_location: "./Frontend"
           output_location: "dist/document-editor/browser"
-          app_build_command: "npm ci && npm run build -- --configuration testing"
+          app_build_command: "npm install && npm run build -- --configuration testing"
