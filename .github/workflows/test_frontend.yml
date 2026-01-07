@@ -3,11 +3,7 @@ name: Azure Frontend
 on:
   workflow_call: 
 
-permissions:
-  contents: read
-  packages: write
-  attestations: write
-  id-token: write
+permissions: write-all
 
 jobs:
   deploy:
@@ -37,7 +33,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_PAT }}
 
 
       - name: Docker meta
