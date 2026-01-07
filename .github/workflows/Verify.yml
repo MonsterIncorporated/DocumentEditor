@@ -12,6 +12,7 @@ on:
       - test
 
 permissions:
+  id-token: write
   packages: write
   contents: write
   issues: write
@@ -80,6 +81,7 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
+      id-token: write
 
   call-frontend:
     if: github.event_name == 'push' && github.event.pull_request.base.ref != 'main'
@@ -91,3 +93,4 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
+      id-token: write
