@@ -12,7 +12,8 @@ on:
       - test
 
 permissions:
-  contents: read
+  packages: write
+  contents: write
   issues: write
   pull-requests: write
 
@@ -75,11 +76,18 @@ jobs:
     uses: ./.github/workflows/test_backend.yml
     secrets: inherit
     permissions:
-      id-token: write
-      contents: read
+      packages: write
+      contents: write
+      issues: write
+      pull-requests: write
 
   call-frontend:
     if: github.event_name == 'push' && github.event.pull_request.base.ref != 'main'
     needs: [ Backend, Frontend ]
     uses: ./.github/workflows/test_frontend.yml
     secrets: inherit
+    permissions:
+      packages: write
+      contents: write
+      issues: write
+      pull-requests: write
