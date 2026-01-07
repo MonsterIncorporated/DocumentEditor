@@ -3,7 +3,11 @@ name: Azure Frontend
 on:
   workflow_call: 
 
-permissions: write-all
+permissions:
+  packages: write
+  contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
   deploy:
