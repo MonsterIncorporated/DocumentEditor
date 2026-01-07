@@ -3,6 +3,12 @@ name: Azure Frontend
 on:
   workflow_call: 
 
+permissions:
+  contents: read
+  packages: write
+  attestations: write
+  id-token: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
