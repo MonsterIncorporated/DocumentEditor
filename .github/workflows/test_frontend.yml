@@ -49,7 +49,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./Frontend
-          file: ./Docker/Frontend
+          file: ./Docker/Frontend/Dockerfile
           push: true
           tags: ${{ steps.meta-frontend.outputs.tags }}
 
